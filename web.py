@@ -5,9 +5,9 @@ import psycopg2
 import os
 
 app = Flask(__name__)
-app.secret_key = os.environ.get("SECRET_KEY")
+app.secret_key = os.environ.get("SECRET_KEY", "fallback-secret-key")
 
-#Secure cookies
+# Secure cookies
 app.config.update(
     SESSION_COOKIE_HTTPONLY=True,
     SESSION_COOKIE_SECURE=True,
@@ -15,15 +15,18 @@ app.config.update(
 )
 
 bcrypt = Bcrypt(app)
-login_manager = LoginManager(app)
+
+login_manager = LoginManager()
+login_manager.init_app(app)
 login_manager.login_view = "login"
 
-DATABASE_URL = os.environ.get("schema.sql")
+# ✅ CORRECT DATABASE URL
+DATABASE_URL = os.environ.get("DATABASE_URL")
 
 def get_db():
     return psycopg2.connect(DATABASE_URL, sslmode="require")
 
-#User Model
+# User Model
 class User(UserMixin):
     def __init__(self, id, username, password_hash):
         self.id = id
@@ -34,13 +37,16 @@ class User(UserMixin):
 def load_user(user_id):
     conn = get_db()
     cur = conn.cursor()
-    cur.execute("SELECT id, username, password_hash FROM users WHERE id=%s", (user_id,))
+    cur.execute(
+        "SELECT id, username, password_hash FROM users WHERE id = %s",
+        (user_id,)
+    )
     user = cur.fetchone()
     cur.close()
     conn.close()
     return User(*user) if user else None
 
-# login
+# LOGIN
 @app.route("/", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
@@ -50,7 +56,7 @@ def login():
         conn = get_db()
         cur = conn.cursor()
         cur.execute(
-            "SELECT id, username, password_hash FROM users WHERE username=%s",
+            "SELECT id, username, password_hash FROM users WHERE username = %s",
             (username,)
         )
         user = cur.fetchone()
@@ -65,7 +71,7 @@ def login():
 
     return render_template("login.html")
 
-#Register
+# REGISTER
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
@@ -76,7 +82,6 @@ def register():
 
         conn = get_db()
         cur = conn.cursor()
-
         try:
             cur.execute(
                 "INSERT INTO users (username, password_hash) VALUES (%s, %s)",
@@ -94,13 +99,13 @@ def register():
 
     return render_template("register.html")
 
-# Home
+# HOME
 @app.route("/home")
 @login_required
 def home():
     return render_template("home.html", user=current_user.username)
 
-# Logout
+# LOGOUT
 @app.route("/logout")
 @login_required
 def logout():
