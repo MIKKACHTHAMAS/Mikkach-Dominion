@@ -18,7 +18,7 @@ bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
 login_manager.login_view = "login"
 
-DATABASE_URL = os.environ.get("database\schema.sql")
+DATABASE_URL = os.environ.get("schema.sql")
 
 def get_db():
     return psycopg2.connect(DATABASE_URL, sslmode="require")
@@ -63,7 +63,7 @@ def login():
 
         return "Invalid credentials", 401
 
-    return render_template("templates\login.html")
+    return render_template("login.html")
 
 #Register
 @app.route("/register", methods=["GET", "POST"])
@@ -92,13 +92,13 @@ def register():
 
         return redirect(url_for("login"))
 
-    return render_template("templates\register.html")
+    return render_template("register.html")
 
 # Home
 @app.route("/home")
 @login_required
 def home():
-    return render_template("templates\home.html", user=current_user.username)
+    return render_template("home.html", user=current_user.username)
 
 # Logout
 @app.route("/logout")
