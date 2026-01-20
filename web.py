@@ -20,30 +20,11 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "login"
 
-# DATABASE
+# ✅ CORRECT DATABASE URL
 DATABASE_URL = os.environ.get("DATABASE_URL")
-if not DATABASE_URL:
-    raise Exception("DATABASE_URL environment variable is not set!")
 
 def get_db():
     return psycopg2.connect(DATABASE_URL, sslmode="require")
-
-# Ensure users table exists
-def init_db():
-    conn = get_db()
-    cur = conn.cursor()
-    cur.execute("""
-        CREATE TABLE IF NOT EXISTS users (
-            id SERIAL PRIMARY KEY,
-            username VARCHAR(100) UNIQUE NOT NULL,
-            password_hash TEXT NOT NULL
-        );
-    """)
-    conn.commit()
-    cur.close()
-    conn.close()
-
-init_db()
 
 # User Model
 class User(UserMixin):
@@ -56,83 +37,71 @@ class User(UserMixin):
 def load_user(user_id):
     conn = get_db()
     cur = conn.cursor()
-    cur.execute("SELECT id, username, password_hash FROM users WHERE id = %s", (user_id,))
+    cur.execute(
+        "SELECT id, username, password_hash FROM users WHERE id = %s",
+        (user_id,)
+    )
     user = cur.fetchone()
     cur.close()
     conn.close()
     return User(*user) if user else None
 
-# ----------------------
-# ROUTES
-# ----------------------
-
 # LOGIN
 @app.route("/", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-        username = request.form.get("username")
-        password = request.form.get("password")
+        username = request.form["username"]
+        password = request.form["password"]
 
-        if not username or not password:
-            return "Please provide both username and password", 400
+        conn = get_db()
+        cur = conn.cursor()
+        cur.execute(
+            "SELECT id, username, password_hash FROM users WHERE username = %s",
+            (username,)
+        )
+        user = cur.fetchone()
+        cur.close()
+        conn.close()
 
-        try:
-            conn = get_db()
-            cur = conn.cursor()
-            cur.execute("SELECT id, username, password_hash FROM users WHERE username = %s", (username,))
-            user = cur.fetchone()
-            cur.close()
-            conn.close()
+        if user and bcrypt.check_password_hash(user[2], password):
+            login_user(User(*user))
+            return redirect(url_for("home"))
 
-            if user and bcrypt.check_password_hash(user[2], password):
-                login_user(User(*user))
-                return redirect(url_for("home"))
-            else:
-                return "Invalid credentials", 401
-
-        except Exception as e:
-            return f"Database error: {str(e)}", 500
+        return "Invalid credentials", 401
 
     return render_template("login.html")
-
 
 # REGISTER
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
-        username = request.form.get("username")
-        password = request.form.get("password")
-        confirm_password = request.form.get("confirm_password")
-
-        if not username or not password or not confirm_password:
-            return "All fields are required", 400
+        username = request.form["username"]
+        password = request.form["password"]
+        confirm_password = request.form["confirm_password"]
 
         if password != confirm_password:
             return "Passwords do not match", 400
 
         hashed = bcrypt.generate_password_hash(password).decode("utf-8")
 
+        conn = get_db()
+        cur = conn.cursor()
         try:
-            conn = get_db()
-            cur = conn.cursor()
             cur.execute(
                 "INSERT INTO users (username, password_hash) VALUES (%s, %s)",
                 (username, hashed)
             )
             conn.commit()
-            cur.close()
-            conn.close()
-            return redirect(url_for("login"))
-
         except psycopg2.errors.UniqueViolation:
             conn.rollback()
             return "Username already exists", 400
+        finally:
+            cur.close()
+            conn.close()
 
-        except Exception as e:
-            return f"Database error: {str(e)}", 500
+        return redirect(url_for("login"))
 
     return render_template("register.html")
-
 
 # HOME
 @app.route("/home")
@@ -140,15 +109,9 @@ def register():
 def home():
     return render_template("home.html", user=current_user.username)
 
-
 # LOGOUT
 @app.route("/logout")
 @login_required
 def logout():
     logout_user()
     return redirect(url_for("login"))
-
-
-# RUN
-if __name__ == "__main__":
-    app.run(debug=True)
