@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Welcome</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <style>
+        body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.login-container {
+    background-color: #fff;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 300px;
+}
+
+h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 1.5rem;
+}
+
+.input-group {
+    margin-bottom: 1rem;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #555;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box; /* Ensures padding doesn't affect width */
+}
+
+button {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    margin-top: 1rem;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+.create-an-account {
+    text-align: center;
+    margin-top: 1rem;
+}
+
+.create-an-account a {
+    color: #007BFF;
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+.subtitle {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 25px;
+}
+
+/* Outline button for Register */
+.btn-outline {
+  margin-top: 10px;
+  background: white;
+  color: #0d6efd;
+  border: 1px solid #0d6efd;
+}
+
+.btn-outline:hover {
+  background: #0d6efd;
+  color: white;
+}
+
+  </style>
+  <div class="auth-container">
+    <div class="auth-card">
+      <h2>Welcome</h2>
+      <p class="subtitle">Welcome to my login page</p>
+
+      <a href="login.html">
+        <button class="btn">Login</button>
+      </a>
+
+      <a href="register.html">
+        <button class="btn btn-outline">Register</button>
+      </a>
+    </div>
+  </div>
+
+</body>
+</html>

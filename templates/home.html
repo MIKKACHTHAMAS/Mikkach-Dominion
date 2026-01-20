@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Page Title</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Link to external CSS file -->
+</head>
+<body>
+<style>
+    /* Basic Reset and Styling */
+body {
+    font-family: sans-serif;
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+    background-color: #f4f4f4;
+}
+
+header {
+    background-color: #007BFF;
+    color: #fff;
+    padding: 1rem 0;
+    text-align: center;
+}
+
+nav ul {
+    list-style: none;
+    padding: 0;
+}
+
+nav ul li {
+    display: inline;
+    margin: 0 10px;
+}
+
+nav ul li a {
+    color: #fff;
+    text-decoration: none;
+}
+
+main {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+}
+
+section {
+    flex: 2; /* Main content takes up more space */
+    background: #fff;
+    padding: 15px;
+    margin-right: 10px;
+}
+
+aside {
+    flex: 1; /* Sidebar takes up less space */
+    background: #fff;
+    padding: 15px;
+}
+
+footer {
+    background-color: #007BFF;
+    color: #fff;
+    text-align: center;
+    padding: 1rem 0;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+
+/* A simple media query for responsiveness */
+@media screen and (max-width: 768px) {
+    main {
+        flex-direction: column; /* Stack vertically on small screens */
+    }
+
+    section, aside {
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+}
+
+</style>
+    <header>
+        <h1>Welcome to Our Website</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Mikkach Dominion. All rights reserved.</p>
+    </footer>
+
+    <script src="script.js"></script> <!-- Link to external JavaScript file -->
+
+</body>
+</html>
